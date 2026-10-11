@@ -8,7 +8,7 @@
     "theme": null,
     "resizable": true,
     "fullscreen": false,
-    "maximized": false,
+    "maximized": true,
     "minWidth": 400,
     "minHeight": 300,
     "maxWidth": 1920,
@@ -62,6 +62,6 @@
     "debug": false,
     "pageTitle": true,
     "startMethod": "password",
-    "autoStart": true,
+    "autoStart": false,
     "cors": true
 }
