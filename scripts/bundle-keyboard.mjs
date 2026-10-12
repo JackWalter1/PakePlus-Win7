@@ -63,6 +63,11 @@ function patchCore(source) {
 fs.rmSync(outDir, { recursive: true, force: true })
 fs.mkdirSync(outDir, { recursive: true })
 fs.cpSync(rimeSrc, rimeDest, { recursive: true })
+fs.cpSync(
+    path.join(root, 'node_modules', '@zh-keyboard', 'recognizer', 'models'),
+    path.join(outDir, 'models'),
+    { recursive: true }
+)
 fs.copyFileSync(
     path.join(root, 'node_modules', '@zh-keyboard', 'vue', 'dist', 'style.css'),
     path.join(outDir, 'zh-keyboard.css')

@@ -190,14 +190,16 @@ function createMenu() {
 
 let rimeBaseUrl = ''
 
-// 拼音词库由页面 fetch 加载。应用本身走 file://，这里用本机回环只读服务提供词库，避免系统键盘。
+// 拼音词库和手写模型由页面 fetch 加载。应用本身走 file://，这里用本机回环只读服务提供这些文件。
 function startRimeServer() {
-    const rootDir = path.resolve(__dirname, 'keyboard', 'dist', 'rime')
+    const rootDir = path.resolve(__dirname, 'keyboard', 'dist')
     const types = {
         '.js': 'text/javascript',
         '.wasm': 'application/wasm',
         '.yaml': 'text/yaml',
         '.txt': 'text/plain',
+        '.json': 'application/json',
+        '.bin': 'application/octet-stream',
     }
     return new Promise((resolve, reject) => {
         const server = http.createServer((req, res) => {

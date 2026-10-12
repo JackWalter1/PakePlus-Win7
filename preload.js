@@ -7,6 +7,8 @@ const { contextBridge } = require('electron')
 const path = require('path')
 const { pathToFileURL } = require('url')
 
+const keyboardAssetUrl = ipcRenderer.sendSync('rime-dir-url')
+
 // 暴露受保护的方法给渲染进程
 contextBridge.exposeInMainWorld('electronAPI', {
     // 可以在这里添加需要暴露给网页的 API
@@ -19,7 +21,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     send: (channel, data) => {
         ipcRenderer.send(channel, data)
     },
-    rimeDirUrl: ipcRenderer.sendSync('rime-dir-url'),
+    rimeDirUrl: keyboardAssetUrl + '/rime',
+    handwriteModelUrl: keyboardAssetUrl + '/models/handwrite/model.json',
+    handwriteDictUrl: keyboardAssetUrl + '/models/dict.txt',
     webviewKeyboardPreload: pathToFileURL(
         path.join(__dirname, 'webview-keyboard-preload.js')
     ).href,

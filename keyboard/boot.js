@@ -1,6 +1,11 @@
 import { createApp, h } from 'vue'
-import { ZhKeyboard, registerPinyinEngine } from '@zh-keyboard/vue'
+import {
+    ZhKeyboard,
+    registerHandwritingRecognizer,
+    registerPinyinEngine,
+} from '@zh-keyboard/vue'
 import { RimePinyinEngine } from '@zh-keyboard/pinyin'
+import { ZhkRecognizer } from '@zh-keyboard/recognizer'
 
 const wasmDir = String(window.electronAPI?.rimeDirUrl || '').replace(/\/$/, '')
 
@@ -9,6 +14,13 @@ const engine = new RimePinyinEngine({
     dictVersion: '2.1.2-luna',
 })
 registerPinyinEngine(engine)
+registerHandwritingRecognizer(
+    new ZhkRecognizer({
+        modelPath: window.electronAPI?.handwriteModelUrl || '',
+        dictPath: window.electronAPI?.handwriteDictUrl || '',
+        backend: 'cpu',
+    })
+)
 
 function activeWebview() {
     return document.querySelector('webview.tab-webview.active')
@@ -104,7 +116,7 @@ createApp({
     render() {
         return h(ZhKeyboard, {
             defaultMode: 'zh',
-            enableHandwriting: false,
+            enableHandwriting: true,
             position: 'static',
             disableWhenNoFocus: false,
         })
