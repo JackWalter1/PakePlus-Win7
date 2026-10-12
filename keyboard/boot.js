@@ -50,16 +50,7 @@ globalThis.__vkRoute = {
 function setKeyboardOpen(open) {
     document.body.classList.toggle('vk-open', open)
     const panel = document.getElementById('virtual-keyboard')
-    const button = document.getElementById('keyboard-btn')
     if (panel) panel.classList.toggle('open', open)
-    if (button) button.classList.toggle('toolbar-btn-on', open)
-}
-
-const keyboardButton = document.getElementById('keyboard-btn')
-if (keyboardButton) {
-    keyboardButton.addEventListener('click', () => {
-        setKeyboardOpen(!document.body.classList.contains('vk-open'))
-    })
 }
 
 document.addEventListener('virtual-keyboard-show', () => {
