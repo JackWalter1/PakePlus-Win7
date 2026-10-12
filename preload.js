@@ -4,6 +4,8 @@
 // 也可以让网页通过 window.electronAPI 来调用 API
 const { ipcRenderer } = require('electron')
 const { contextBridge } = require('electron')
+const path = require('path')
+const { pathToFileURL } = require('url')
 
 // 暴露受保护的方法给渲染进程
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -17,6 +19,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     send: (channel, data) => {
         ipcRenderer.send(channel, data)
     },
+    rimeDirUrl: ipcRenderer.sendSync('rime-dir-url'),
+    webviewKeyboardPreload: pathToFileURL(
+        path.join(__dirname, 'webview-keyboard-preload.js')
+    ).href,
 })
 
 // 页面加载完成后的初始化
@@ -48,6 +54,7 @@ ipcRenderer.on('webview-reload', () => {
 ipcRenderer.on('exit-app', () => {
     console.log('exit-app-----222')
     document.getElementById('password-dialog').style.display = 'flex'
+    document.dispatchEvent(new CustomEvent('virtual-keyboard-show'))
     document.getElementById('password-input').value = ''
     document.getElementById('error-message').style.display = 'none'
     document.getElementById('password-input').focus()
@@ -68,6 +75,7 @@ ipcRenderer.on('exit-app', () => {
         .getElementById('password-cancel-btn')
         .addEventListener('click', () => {
             document.getElementById('password-dialog').style.display = 'none'
+            document.dispatchEvent(new CustomEvent('virtual-keyboard-sync'))
         })
 })
 
@@ -83,4 +91,5 @@ ipcRenderer.on('password-verify-success', () => {
     if (passwordDialog) {
         passwordDialog.style.display = 'none'
     }
+    document.dispatchEvent(new CustomEvent('virtual-keyboard-sync'))
 })

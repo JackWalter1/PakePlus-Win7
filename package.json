@@ -4,13 +4,14 @@
     "description": "跨平台桌面应用，支持 Windows 7",
     "main": "main.js",
     "scripts": {
-        "start": "electron .",
-        "build": "electron-builder",
-        "build:win": "electron-builder --win",
-        "build:win32": "electron-builder --win --ia32",
-        "build:win64": "electron-builder --win --x64",
-        "build:mac": "electron-builder --mac",
-        "build:linux": "electron-builder --linux",
+        "bundle:keyboard": "node scripts/bundle-keyboard.mjs",
+        "start": "node scripts/bundle-keyboard.mjs && electron .",
+        "build": "node scripts/bundle-keyboard.mjs && electron-builder",
+        "build:win": "node scripts/bundle-keyboard.mjs && electron-builder --win",
+        "build:win32": "node scripts/bundle-keyboard.mjs && electron-builder --win --ia32",
+        "build:win64": "node scripts/bundle-keyboard.mjs && electron-builder --win --x64",
+        "build:mac": "node scripts/bundle-keyboard.mjs && electron-builder --mac",
+        "build:linux": "node scripts/bundle-keyboard.mjs && electron-builder --linux",
         "icon:icns": "node scripts/createIcon.cjs -icon app-icon.png -padding 1 -format icns",
         "icon:ico": "node scripts/createIcon.cjs -icon app-icon.png",
         "worker:pp": "node scripts/ppworker.cjs"
@@ -25,6 +26,7 @@
     "devDependencies": {
         "electron": "^22.3.27",
         "electron-builder": "^24.9.1",
+        "esbuild": "^0.28.2",
         "png-to-ico": "^3.0.1",
         "sharp": "^0.34.5"
     },
@@ -41,7 +43,9 @@
             "package.json",
             "index.html",
             "renderer.js",
-            "password-dialog.html"
+            "password-dialog.html",
+            "webview-keyboard-preload.js",
+            "keyboard/dist/**/*"
         ],
         "win": {
             "target": [
@@ -83,6 +87,8 @@
         }
     },
     "dependencies": {
+        "@zh-keyboard/pinyin": "^2.1.2",
+        "@zh-keyboard/vue": "^2.1.2",
         "commander": "^13.1.0",
         "fs-extra": "^11.3.0"
     }

@@ -193,6 +193,52 @@
             #password-input:hover {
                 border-color: #4caf50;
             }
+            .toolbar-btn-on {
+                background: #409eff;
+                color: white;
+            }
+            #virtual-keyboard {
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                height: 0;
+                overflow: hidden;
+                z-index: 2000;
+                background: #f7f8f9;
+                border-top: 1px solid #d1d5da;
+            }
+            #virtual-keyboard.open {
+                height: var(--vk-height);
+            }
+            #virtual-keyboard-root,
+            #virtual-keyboard .zhk {
+                width: 100%;
+                max-width: none;
+                height: 100%;
+                min-height: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            #virtual-keyboard[data-engine-error]::after {
+                content: attr(data-engine-error);
+                position: absolute;
+                top: 8px;
+                left: 12px;
+                color: #f44336;
+                font-size: 14px;
+                z-index: 2;
+            }
+            :root {
+                --vk-height: 280px;
+            }
+            body.vk-open #tab-content {
+                margin-bottom: var(--vk-height);
+            }
+            body.vk-open #password-dialog {
+                padding-bottom: var(--vk-height);
+                box-sizing: border-box;
+            }
         </style>
     </head>
     <body>
@@ -200,6 +246,7 @@
             <div class="toolbar-buttons">
                 <button class="toolbar-btn" id="home-btn">主页</button>
                 <button class="toolbar-btn" id="reload-btn">刷新</button>
+                <button class="toolbar-btn" id="keyboard-btn">键盘</button>
                 <button class="toolbar-btn" id="exit-btn">退出</button>
             </div>
             <!-- <button id="new-tab-btn" onclick="addNewTab('https://juejin.cn/')">
@@ -230,6 +277,11 @@
                 </div>
             </div>
         </div>
+        <div id="virtual-keyboard">
+            <div id="virtual-keyboard-root"></div>
+        </div>
+        <link rel="stylesheet" href="keyboard/dist/zh-keyboard.css" />
         <script src="renderer.js"></script>
+        <script type="module" src="keyboard/dist/app.js"></script>
     </body>
 </html>

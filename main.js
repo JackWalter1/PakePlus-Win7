@@ -1,5 +1,7 @@
 // main.js
 const { app, BrowserWindow, Menu, ipcMain } = require('electron')
+const http = require('http')
+const fs = require('fs')
 const path = require('path')
 
 let mainWindow = null
@@ -186,6 +188,52 @@ function createMenu() {
     Menu.setApplicationMenu(menu)
 }
 
+let rimeBaseUrl = ''
+
+// 拼音词库由页面 fetch 加载。应用本身走 file://，这里用本机回环只读服务提供词库，避免系统键盘。
+function startRimeServer() {
+    const rootDir = path.resolve(__dirname, 'keyboard', 'dist', 'rime')
+    const types = {
+        '.js': 'text/javascript',
+        '.wasm': 'application/wasm',
+        '.yaml': 'text/yaml',
+        '.txt': 'text/plain',
+    }
+    return new Promise((resolve, reject) => {
+        const server = http.createServer((req, res) => {
+            const url = new URL(req.url, 'http://127.0.0.1')
+            const relativePath = decodeURIComponent(url.pathname).replace(/^[/\\]+/, '')
+            const filePath = path.resolve(rootDir, relativePath)
+            if (filePath !== rootDir && !filePath.startsWith(rootDir + path.sep)) {
+                res.writeHead(403)
+                res.end()
+                return
+            }
+            fs.readFile(filePath, (error, data) => {
+                if (error) {
+                    res.writeHead(404)
+                    res.end()
+                    return
+                }
+                res.writeHead(200, {
+                    'Content-Type': types[path.extname(filePath)] || 'application/octet-stream',
+                    'Access-Control-Allow-Origin': '*',
+                    'Cross-Origin-Resource-Policy': 'cross-origin',
+                })
+                res.end(data)
+            })
+        })
+        server.on('error', reject)
+        server.listen(0, '127.0.0.1', () => {
+            resolve(`http://127.0.0.1:${server.address().port}`)
+        })
+    })
+}
+
+ipcMain.on('rime-dir-url', (event) => {
+    event.returnValue = rimeBaseUrl
+})
+
 // 禁止打开任务管理器
 function autoStart() {
     // 禁用Ctrl+Shift+Esc
@@ -195,7 +243,8 @@ function autoStart() {
     })
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+    rimeBaseUrl = await startRimeServer()
     createWindow()
     // createMenu() // 不再需要菜单栏，按钮已移到 tab 栏
     autoStart()

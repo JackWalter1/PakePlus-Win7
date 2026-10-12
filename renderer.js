@@ -52,6 +52,9 @@ function addNewTab(url) {
     const webview = document.createElement('webview')
     webview.className = 'tab-webview'
     webview.id = tabId
+    if (window.electronAPI && window.electronAPI.webviewKeyboardPreload) {
+        webview.preload = window.electronAPI.webviewKeyboardPreload
+    }
     webview.src = url
     webview.setAttribute('allowpopups', 'on')
 
@@ -124,6 +127,7 @@ function initToolbarButtons() {
 
         if (passwordDialog) {
             passwordDialog.style.display = 'flex'
+            document.dispatchEvent(new CustomEvent('virtual-keyboard-show'))
             if (passwordInput) {
                 passwordInput.value = ''
                 passwordInput.focus()
@@ -161,6 +165,7 @@ function initToolbarButtons() {
             const passwordDialog = document.getElementById('password-dialog')
             if (passwordDialog) {
                 passwordDialog.style.display = 'none'
+                document.dispatchEvent(new CustomEvent('virtual-keyboard-sync'))
             }
         })
     }
@@ -235,6 +240,45 @@ function setupWebviewListeners(webview, tabEl) {
     webview.addEventListener('dom-ready', () => {
         // 也可以在这里执行一些脚本，例如自定义右键菜单
         console.log('dom-ready-----')
+        webview
+            .executeJavaScript(`(() => {
+                const blocked = { button:1, checkbox:1, color:1, file:1, hidden:1, image:1, radio:1, range:1, reset:1, submit:1 }
+                const editable = (element) => {
+                    let current = element
+                    while (current && current !== document.body) {
+                        if (current.isContentEditable) return true
+                        const tag = current.tagName
+                        if (tag === 'TEXTAREA') return true
+                        if (tag === 'INPUT') {
+                            const type = String(current.type || 'text').toLowerCase()
+                            return !blocked[type]
+                        }
+                        current = current.parentElement
+                    }
+                    return false
+                }
+                const publish = (element) => {
+                    if (typeof window.__vkReport === 'function') window.__vkReport(editable(element))
+                }
+                if (!window.__vkHooked) {
+                    window.__vkHooked = true
+                    document.addEventListener('focusin', (event) => publish(event.target), true)
+                    document.addEventListener('pointerdown', (event) => publish(event.target), true)
+                }
+                publish(document.activeElement)
+            })()`)
+            .catch((error) => {
+                console.log('vk hook failed', error)
+            })
+    })
+
+    webview.addEventListener('ipc-message', (event) => {
+        if (event.channel !== 'vk-editing') return
+        const editing = !!event.args[0]
+        window.__vkEditing = editing
+        if (typeof window.__vkApplyEditing === 'function') {
+            window.__vkApplyEditing(editing)
+        }
     })
 
     // 监听页面导航，更新标签标题
