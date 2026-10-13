@@ -1,4 +1,4 @@
-name: Build Windows
+name: Build
 
 on:
     push:
@@ -10,17 +10,116 @@ on:
                 description: '版本号 (例如: 1.0.0)'
                 required: false
                 default: '0.0.1'
+            build_macos_arm64:
+                description: 'Build for macOS arm64 (Apple Silicon)'
+                required: false
+                type: boolean
+                default: false
+            build_macos_x64:
+                description: 'Build for macOS x86_64 (Intel)'
+                required: false
+                type: boolean
+                default: false
+            build_linux_x86_64:
+                description: 'Build for Linux x64'
+                required: false
+                type: boolean
+                default: false
+            build_linux_arm64:
+                description: 'Build for Linux arm64'
+                required: false
+                type: boolean
+                default: false
+            build_windows_x86_64:
+                description: 'Build for Windows x64'
+                required: false
+                type: boolean
+                default: false
+            build_windows_arm64:
+                description: 'Build for Windows arm64'
+                required: false
+                type: boolean
+                default: false
 
 permissions:
     contents: write
 
 jobs:
-    build-windows:
-        runs-on: windows-latest
+    prepare:
+        name: Select platforms
+        runs-on: ubuntu-latest
+        outputs:
+            matrix: ${{ steps.set.outputs.matrix }}
+        steps:
+            - name: Build target matrix
+              id: set
+              env:
+                  EVENT_NAME: ${{ github.event_name }}
+                  BUILD_MACOS_ARM64: ${{ github.event.inputs.build_macos_arm64 }}
+                  BUILD_MACOS_X64: ${{ github.event.inputs.build_macos_x64 }}
+                  BUILD_LINUX_X86_64: ${{ github.event.inputs.build_linux_x86_64 }}
+                  BUILD_LINUX_ARM64: ${{ github.event.inputs.build_linux_arm64 }}
+                  BUILD_WINDOWS_X86_64: ${{ github.event.inputs.build_windows_x86_64 }}
+                  BUILD_WINDOWS_ARM64: ${{ github.event.inputs.build_windows_arm64 }}
+              run: |
+                  set -euo pipefail
+                  matrix='[]'
 
+                  add() {
+                    matrix=$(jq -c \
+                      --arg label "$1" \
+                      --arg os "$2" \
+                      --arg script "$3" \
+                      --arg arch "$4" \
+                      --arg artifact "$5" \
+                      --arg glob "$6" \
+                      '. + [{label:$label, os:$os, script:$script, arch:$arch, artifact:$artifact, glob:$glob}]' \
+                      <<<"$matrix")
+                  }
+
+                  # Tag pushes keep the existing Windows x64 release build.
+                  # workflow_dispatch builds only the platforms selected in the form.
+                  if [[ "$EVENT_NAME" == "push" || "$BUILD_WINDOWS_X86_64" == "true" ]]; then
+                    add "Windows x64" "windows-latest" "build:win" "x64" "windows-x64" "dist/*.exe"
+                  fi
+                  if [[ "$BUILD_WINDOWS_ARM64" == "true" ]]; then
+                    add "Windows arm64" "windows-latest" "build:win" "arm64" "windows-arm64" "dist/*.exe"
+                  fi
+                  if [[ "$BUILD_MACOS_ARM64" == "true" ]]; then
+                    add "macOS arm64" "macos-latest" "build:mac" "arm64" "macos-arm64" "dist/*.dmg"
+                  fi
+                  if [[ "$BUILD_MACOS_X64" == "true" ]]; then
+                    add "macOS x64" "macos-latest" "build:mac" "x64" "macos-x64" "dist/*.dmg"
+                  fi
+                  if [[ "$BUILD_LINUX_X86_64" == "true" ]]; then
+                    add "Linux x64" "ubuntu-latest" "build:linux" "x64" "linux-x64" "dist/*.{AppImage,deb}"
+                  fi
+                  if [[ "$BUILD_LINUX_ARM64" == "true" ]]; then
+                    add "Linux arm64" "ubuntu-24.04-arm" "build:linux" "arm64" "linux-arm64" "dist/*.{AppImage,deb}"
+                  fi
+
+                  echo "Selected targets:"
+                  echo "$matrix" | jq .
+
+                  if [[ "$(jq 'length' <<<"$matrix")" -eq 0 ]]; then
+                    echo "::error::No platform selected. Enable at least one build_* input."
+                    exit 1
+                  fi
+
+                  {
+                    echo "matrix<<EOF"
+                    echo "$matrix"
+                    echo "EOF"
+                  } >> "$GITHUB_OUTPUT"
+
+    build:
+        name: ${{ matrix.label }}
+        needs: prepare
+        runs-on: ${{ matrix.os }}
         strategy:
+            fail-fast: false
             matrix:
-                arch: [x64]
+                include: ${{ fromJson(needs.prepare.outputs.matrix) }}
 
         steps:
             - name: Checkout code
@@ -32,41 +131,32 @@ jobs:
                   node-version: '18'
                   cache: 'npm'
 
+            - name: Install Linux packaging tools
+              if: runner.os == 'Linux'
+              run: sudo apt-get update && sudo apt-get install -y fakeroot dpkg
+
             - name: Install dependencies
               run: npm ci
 
             - name: Run worker
               run: node scripts/ppworker.cjs
 
-            - name: Get version number
-              id: version
-              run: |
-                  if ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ github.event.inputs.version }}" -ne "") {
-                    echo "version=${{ github.event.inputs.version }}" >> $env:GITHUB_OUTPUT
-                  } else {
-                    $packageJson = Get-Content package.json | ConvertFrom-Json
-                    echo "version=$($packageJson.version)" >> $env:GITHUB_OUTPUT
-                  }
-              shell: pwsh
-
-            - name: Build Windows (${{ matrix.arch }})
-              run: npm run build:win -- --${{ matrix.arch }}
+            - name: Build ${{ matrix.label }}
+              run: npm run ${{ matrix.script }} -- --${{ matrix.arch }}
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: List build artifacts
-              run: dir dist /B
-              shell: cmd
+                  CSC_IDENTITY_AUTO_DISCOVERY: false
 
             - name: Upload build artifacts
               uses: actions/upload-artifact@v4
               with:
-                  name: windows-${{ matrix.arch }}
-                  path: dist/*.exe
+                  name: ${{ matrix.artifact }}
+                  path: ${{ matrix.glob }}
                   retention-days: 30
+                  if-no-files-found: error
 
     release:
-        needs: build-windows
+        needs: build
         runs-on: ubuntu-latest
         if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
 
@@ -91,23 +181,14 @@ jobs:
               uses: actions/download-artifact@v4
               with:
                   path: artifacts
-                  pattern: windows-*
-                  merge-multiple: true
+                  pattern: '*'
 
             - name: List downloaded file structure
               run: |
                   echo "=== 文件结构 ==="
-                  find artifacts -type f -name "*.exe" | sort
+                  find artifacts -type f | sort
                   echo "=== 文件详情 ==="
-                  ls -la artifacts/
-                  if [ -d "artifacts/windows-ia32" ]; then
-                    echo "=== windows-ia32 目录 ==="
-                    ls -la artifacts/windows-ia32/
-                  fi
-                  if [ -d "artifacts/windows-x64" ]; then
-                    echo "=== windows-x64 目录 ==="
-                    ls -la artifacts/windows-x64/
-                  fi
+                  find artifacts -type d -exec ls -la {} \;
 
             - name: Rename files (prefix with branch or tag name)
               run: |
@@ -115,26 +196,10 @@ jobs:
 
                   echo "使用前缀: $PREFIX"
 
-                  # 处理 artifacts 根目录
-                  for file in artifacts/*.exe; do
-                    if [ -f "$file" ]; then
-                      dir=$(dirname "$file")
-                      base=$(basename "$file")
-                      new_file="$dir/$PREFIX-$base"
-
-                      if [ "$file" != "$new_file" ]; then
-                        mv "$file" "$new_file"
-                        echo "重命名: $file -> $new_file"
-                      fi
-                    fi
-                  done
-
-                  # 处理子目录中的 exe 文件
-                  find artifacts -type f -name "*.exe" | while read file; do
+                  find artifacts -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.AppImage" -o -name "*.deb" \) | while read -r file; do
                     dir=$(dirname "$file")
                     base=$(basename "$file")
 
-                    # 避免重复加前缀
                     if [[ "$base" != "$PREFIX-"* ]]; then
                       new_file="$dir/$PREFIX-$base"
                       mv "$file" "$new_file"
@@ -148,18 +213,27 @@ jobs:
                   tag_name: ${{ github.ref_name }}
                   name: Release v${{ steps.version.outputs.version }}
                   body: |
-                      ## Windows 版本发布 v${{ steps.version.outputs.version }}
+                      ## 多平台版本发布 v${{ steps.version.outputs.version }}
 
-                      自动构建的 Windows 版本，包含 32位 和 64位 架构。
+                      按所选平台自动构建。标签推送默认构建 Windows x64；手动运行可勾选以下平台：
+
+                      - macOS arm64 (Apple Silicon) / macOS x64 (Intel)
+                      - Linux x64 / Linux arm64
+                      - Windows x64 / Windows arm64
 
                       ### 文件说明
-                      - `*setup.exe`: 安装程序版本
-                      - `*.exe` (非setup): 便携版本
+                      - `*setup.exe`: Windows 安装程序
+                      - `*.exe` (非 setup): Windows 便携版本
+                      - `*.dmg`: macOS 安装包
+                      - `*.AppImage` / `*.deb`: Linux 安装包
 
                       ### 系统要求
                       - Windows 7 或更高版本
-                      - 请根据您的系统架构选择对应的版本
+                      - 请根据系统与架构选择对应的文件
                   files: |
                       artifacts/**/*.exe
+                      artifacts/**/*.dmg
+                      artifacts/**/*.AppImage
+                      artifacts/**/*.deb
                   draft: false
                   prerelease: false
