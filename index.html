@@ -5,53 +5,231 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Electron Tab Browser</title>
         <style>
-            /* 简单 CSS 样式 */
+            * {
+                box-sizing: border-box;
+            }
+            :root {
+                --chrome-strip: #dee1e6;
+                --chrome-strip-darker: #d3d7dd;
+                --chrome-tab: #ffffff;
+                --chrome-tab-hover: #cfd3d9;
+                --chrome-toolbar: #ffffff;
+                --chrome-text: #202124;
+                --chrome-muted: #5f6368;
+                --chrome-curve: 10px;
+            }
             body {
                 margin: 0;
                 display: flex;
                 flex-direction: column;
                 height: 100vh;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+                    sans-serif;
+                color: var(--chrome-text);
+                background: var(--chrome-strip);
+                -webkit-font-smoothing: antialiased;
+            }
+            #chrome-header {
+                flex-shrink: 0;
+                background: var(--chrome-strip);
             }
             #tab-bar {
                 height: 40px;
-                background: #f0f0f0;
+                min-height: 40px;
+                padding: 6px 8px 0;
                 display: flex;
-                align-items: center;
-                /* padding-left: 10px; */
+                align-items: flex-end;
+                gap: 6px;
+                background: var(--chrome-strip);
+                overflow: hidden;
             }
             .toolbar-buttons {
                 display: flex;
                 align-items: center;
-                height: 100%;
-                border-right: 1px solid #ccc;
-                padding: 0 5px;
+                gap: 2px;
+                height: 32px;
+                padding: 0 8px 0 2px;
+                margin-bottom: 0;
+                flex-shrink: 0;
+                border-right: 1px solid #c4c7ce;
             }
             .toolbar-btn {
-                padding: 5px 12px;
-                margin: 0 2px;
-                border: none;
-                background: #e0e0e0;
-                cursor: pointer;
-                font-size: 16px;
-                /* font-weight: bold; */
-                line-height: 20px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
                 height: 28px;
-                border-radius: 3px;
-                color: #333;
+                padding: 0 10px;
+                border: none;
+                border-radius: 14px;
+                background: transparent;
+                color: var(--chrome-muted);
+                font-size: 12px;
+                font-weight: 500;
+                font-family: inherit;
+                line-height: 1;
+                cursor: pointer;
+                transition: background 0.12s ease, color 0.12s ease,
+                    transform 0.08s ease;
+                -webkit-tap-highlight-color: transparent;
+                user-select: none;
             }
-            /* .toolbar-btn:hover {
-                background: #d0d0d0;
-            } */
-            /* .toolbar-btn:active {
-                background: #c0c0c0;
-            } */
+            .toolbar-btn svg {
+                width: 14px;
+                height: 14px;
+                flex-shrink: 0;
+            }
+            .toolbar-btn:hover {
+                background: rgba(255, 255, 255, 0.55);
+                color: var(--chrome-text);
+            }
+            .toolbar-btn:active {
+                background: rgba(255, 255, 255, 0.75);
+                transform: scale(0.97);
+            }
+            .toolbar-btn.exit-btn {
+                color: #c5221f;
+            }
+            .toolbar-btn.exit-btn:hover {
+                background: #fce8e6;
+                color: #a50e0e;
+            }
+            #tabs-container {
+                display: flex;
+                align-items: flex-end;
+                flex: 1;
+                min-width: 0;
+                height: 100%;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: none;
+            }
+            #tabs-container::-webkit-scrollbar {
+                display: none;
+            }
+            .tab {
+                position: relative;
+                display: flex;
+                align-items: center;
+                height: 32px;
+                min-width: 72px;
+                max-width: 220px;
+                width: 180px;
+                flex: 1 1 180px;
+                padding: 0 12px 0 14px;
+                margin: 0;
+                cursor: pointer;
+                color: var(--chrome-muted);
+                font-size: 12px;
+                font-weight: 500;
+                z-index: 1;
+                -webkit-tap-highlight-color: transparent;
+                user-select: none;
+            }
+            .tab::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                border-radius: 10px 10px 0 0;
+                background: transparent;
+                z-index: -1;
+            }
+            .tab:hover:not(.active)::before {
+                background: var(--chrome-tab-hover);
+            }
+            /* 非激活标签之间的细分隔线 */
+            .tab:not(.active):not(:hover) .tab-divider {
+                position: absolute;
+                right: 0;
+                top: 8px;
+                bottom: 8px;
+                width: 1px;
+                background: #aeb3ba;
+                z-index: 2;
+            }
+            .tab.active + .tab .tab-divider,
+            .tab:hover + .tab .tab-divider,
+            .tab:hover .tab-divider,
+            /* 最后一个标签左侧（即倒数第二个标签右侧）不要分割线 */
+            .tab:nth-last-child(2) .tab-divider,
+            .tab:last-child .tab-divider {
+                display: none;
+            }
             .tab.active {
-                background: white;
-                border-bottom: none;
+                z-index: 3;
+                color: var(--chrome-text);
+            }
+            .tab.active::before {
+                background: var(--chrome-tab);
+            }
+            /* Chrome 式左右凹角 */
+            .tab-curve-left,
+            .tab-curve-right {
+                display: none;
+                position: absolute;
+                bottom: 0;
+                width: var(--chrome-curve);
+                height: var(--chrome-curve);
+                pointer-events: none;
+                z-index: 0;
+            }
+            .tab.active .tab-curve-left,
+            .tab.active .tab-curve-right {
+                display: block;
+            }
+            .tab.active .tab-curve-left {
+                left: calc(var(--chrome-curve) * -1);
+                background: radial-gradient(
+                    circle at 0 0,
+                    transparent var(--chrome-curve),
+                    var(--chrome-tab) calc(var(--chrome-curve) + 0.5px)
+                );
+            }
+            .tab.active .tab-curve-right {
+                right: calc(var(--chrome-curve) * -1);
+                background: radial-gradient(
+                    circle at 100% 0,
+                    transparent var(--chrome-curve),
+                    var(--chrome-tab) calc(var(--chrome-curve) + 0.5px)
+                );
+            }
+            .tab-title {
+                flex: 1;
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                padding-right: 4px;
+            }
+            .close-btn {
+                display: none;
+                align-items: center;
+                justify-content: center;
+                width: 18px;
+                height: 18px;
+                margin-left: 2px;
+                border-radius: 50%;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 1;
+                cursor: pointer;
+                color: var(--chrome-muted);
+                background: transparent;
+                flex-shrink: 0;
+            }
+            .tab:hover .close-btn,
+            .tab.active .close-btn {
+                display: inline-flex;
+            }
+            .close-btn:hover {
+                background: #dadce0;
+                color: var(--chrome-text);
             }
             #tab-content {
                 flex-grow: 1;
                 position: relative;
+                background: #fff;
             }
             .tab-webview {
                 width: 100%;
@@ -59,51 +237,10 @@
                 position: absolute;
                 top: 0;
                 left: 0;
-                /* 隐藏非激活的 webview */
                 display: none;
             }
             .tab-webview.active {
                 display: flex;
-            }
-            .tab {
-                /* 启用 flex 布局来对齐标题和关闭按钮 */
-                position: relative;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0 5px 0 15px; /* 调整内边距以适应按钮 */
-                line-height: 40px;
-                cursor: pointer;
-                border-right: 1px solid #ccc;
-                background: #e0e0e0;
-                width: 100px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            .tab-title {
-                width: 100px;
-                padding-right: 16px;
-            }
-            .active .close-btn {
-                display: block;
-                background: white;
-            }
-            .close-btn {
-                position: absolute;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                margin: auto;
-                font-weight: bold;
-                cursor: pointer;
-                padding: 0 5px;
-                height: 100%; /* 让按钮与标签页高度一致 */
-                line-height: 40px; /* 垂直居中 'x' */
-                background: #e0e0e0;
-            }
-            .close-btn:hover {
-                background: #ccc;
             }
             /* 密码输入框样式 */
             #password-dialog {
@@ -238,15 +375,34 @@
         </style>
     </head>
     <body>
-        <div id="tab-bar">
-            <div class="toolbar-buttons">
-                <button class="toolbar-btn" id="home-btn">主页</button>
-                <button class="toolbar-btn" id="reload-btn">刷新</button>
-                <button class="toolbar-btn" id="exit-btn">退出</button>
+        <div id="chrome-header">
+            <div id="tab-bar">
+                <div class="toolbar-buttons">
+                    <button class="toolbar-btn" id="home-btn" title="主页">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 10.5 12 3l9 7.5" />
+                            <path d="M5 9.5V21h14V9.5" />
+                        </svg>
+                        <span>主页</span>
+                    </button>
+                    <button class="toolbar-btn" id="reload-btn" title="刷新">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 12a9 9 0 1 1-2.6-6.4" />
+                            <path d="M21 3v6h-6" />
+                        </svg>
+                        <span>刷新</span>
+                    </button>
+                    <button class="toolbar-btn exit-btn" id="exit-btn" title="退出">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M10 17H5V7h5" />
+                            <path d="M14 12H21" />
+                            <path d="M18 9l3 3-3 3" />
+                        </svg>
+                        <span>退出</span>
+                    </button>
+                </div>
+                <div id="tabs-container"></div>
             </div>
-            <!-- <button id="new-tab-btn" onclick="addNewTab('https://juejin.cn/')">
-                +
-            </button> -->
         </div>
         <div id="tab-content"></div>
         <!-- 弹出密码输入框 -->

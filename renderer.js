@@ -1,5 +1,5 @@
 // renderer.js
-const tabBar = document.getElementById('tab-bar')
+const tabBar = document.getElementById('tabs-container') || document.getElementById('tab-bar')
 const tabContent = document.getElementById('tab-content')
 let tabIdCounter = 0
 // 定义默认主页URL
@@ -20,13 +20,20 @@ function addNewTab(url) {
     const tabEl = document.createElement('div')
     tabEl.className = 'tab'
     tabEl.id = `header-${tabId}`
+    tabEl.onclick = () => activateTab(tabId)
+
+    // Chrome 式左右凹角 + 分隔线
+    const curveLeft = document.createElement('span')
+    curveLeft.className = 'tab-curve-left'
+    const curveRight = document.createElement('span')
+    curveRight.className = 'tab-curve-right'
+    const divider = document.createElement('span')
+    divider.className = 'tab-divider'
 
     // 创建标题文本
     const titleSpan = document.createElement('span')
     titleSpan.textContent = '新标签页' // 初始标题
     titleSpan.className = 'tab-title'
-    // 点击标题时激活标签页
-    titleSpan.onclick = () => activateTab(tabId)
 
     // 创建关闭按钮
     const closeBtn = document.createElement('span')
@@ -39,13 +46,16 @@ function addNewTab(url) {
     }
 
     // 将标题和关闭按钮添加到标签页元素中
+    tabEl.appendChild(curveLeft)
+    tabEl.appendChild(curveRight)
+    tabEl.appendChild(divider)
     tabEl.appendChild(titleSpan)
     // 第一个tab不显示关闭按钮
     if (tabIdCounter > 1) {
         tabEl.appendChild(closeBtn)
     }
 
-    tabBar.insertBefore(tabEl, document.getElementById('new-tab-btn'))
+    tabBar.appendChild(tabEl)
 
     // ... (WebView 创建逻辑保持不变) ...
 
