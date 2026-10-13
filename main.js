@@ -236,13 +236,49 @@ ipcMain.on('rime-dir-url', (event) => {
     event.returnValue = rimeBaseUrl
 })
 
-// 禁止打开任务管理器
+// 开机自启动：Windows/macOS 用系统 API；Linux 用 XDG Autostart（~/.config/autostart）
 function autoStart() {
-    // 禁用Ctrl+Shift+Esc
+    if (process.platform === 'linux') {
+        enableLinuxAutoStart()
+        return
+    }
     app.setLoginItemSettings({
-        openAtLogin: true, // 设置应用为开机自启动
-        openAsHidden: false, // 应用启动时是否隐藏
+        openAtLogin: true,
+        openAsHidden: false,
     })
+}
+
+function enableLinuxAutoStart() {
+    try {
+        const home = process.env.HOME || require('os').homedir()
+        const autostartDir = path.join(home, '.config', 'autostart')
+        const desktopPath = path.join(autostartDir, 'pakeplus-win7.desktop')
+
+        // AppImage 要用 APPIMAGE 路径；deb/rpm 用可执行文件路径
+        const execPath = process.env.APPIMAGE || process.execPath
+        const execQuoted = `"${execPath.replace(/"/g, '\\"')}"`
+        const name = app.getName() || 'PakeTabs'
+
+        const content = [
+            '[Desktop Entry]',
+            'Type=Application',
+            `Name=${name}`,
+            `Comment=${name} autostart`,
+            `Exec=${execQuoted}`,
+            'Terminal=false',
+            'X-GNOME-Autostart-enabled=true',
+            'Hidden=false',
+            'NoDisplay=false',
+            '',
+        ].join('\n')
+
+        fs.mkdirSync(autostartDir, { recursive: true })
+        fs.writeFileSync(desktopPath, content, 'utf-8')
+        fs.chmodSync(desktopPath, 0o644)
+        console.log('Linux autostart enabled:', desktopPath, '->', execPath)
+    } catch (e) {
+        console.error('Failed to enable Linux autostart:', e)
+    }
 }
 
 app.whenReady().then(async () => {

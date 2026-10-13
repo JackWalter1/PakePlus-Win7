@@ -12,6 +12,9 @@
         "build:win64": "node scripts/bundle-keyboard.mjs && electron-builder --win --x64",
         "build:mac": "node scripts/bundle-keyboard.mjs && electron-builder --mac",
         "build:linux": "node scripts/bundle-keyboard.mjs && electron-builder --linux",
+        "build:linux:amd64": "node scripts/bundle-keyboard.mjs && electron-builder --linux --x64",
+        "build:linux:arm64": "node scripts/bundle-keyboard.mjs && electron-builder --linux --arm64",
+        "build:linux:arm": "node scripts/bundle-keyboard.mjs && electron-builder --linux --armv7l",
         "icon:icns": "node scripts/createIcon.cjs -icon app-icon.png -padding 1 -format icns",
         "icon:ico": "node scripts/createIcon.cjs -icon app-icon.png",
         "worker:pp": "node scripts/ppworker.cjs"
@@ -21,7 +24,10 @@
         "desktop",
         "cross-platform"
     ],
-    "author": "",
+    "author": {
+        "name": "PakePlus",
+        "email": "support@pakeplus.com"
+    },
     "license": "MIT",
     "devDependencies": {
         "electron": "^22.3.27",
