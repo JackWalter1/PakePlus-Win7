@@ -4,11 +4,18 @@ const { execSync } = require('child_process')
 const ppconfig = require('./ppconfig.json')
 
 // update package.json build productName
+<<<<<<< HEAD
 const updatePackageJson = async (appName, version) => {
     const packageJson = await fs.readJson(
         path.join(__dirname, '../', 'package.json')
     )
     packageJson.version = version
+=======
+const updatePackageJson = async (appName) => {
+    const packageJson = await fs.readJson(
+        path.join(__dirname, '../', 'package.json')
+    )
+>>>>>>> a54b06f3f3e17d768d1e7c24275772a0a8ea0ffd
     packageJson.build.productName = appName
     await fs.writeJson(path.join(__dirname, '../', 'package.json'), packageJson)
 }
@@ -89,6 +96,7 @@ const createIcoIcon = async () => {
 // Main execution
 const main = async () => {
     console.log('🚀 worker start')
+<<<<<<< HEAD
     const { name, version, url, password } = ppconfig
     console.log('name:', name)
     console.log('version:', version)
@@ -99,6 +107,18 @@ const main = async () => {
     await updateMainJs(password)
     await createIcnsIcon()
     await createIcoIcon()
+=======
+    const { name, version, url } = ppconfig
+    console.log('name:', name)
+    console.log('version:', version)
+    console.log('url:', url)
+    // console.log('password:', password)
+    await updatePackageJson(name)
+    // await updateRendererJs(url)
+    // await updateMainJs(password)
+    // await createIcnsIcon()
+    // await createIcoIcon()
+>>>>>>> a54b06f3f3e17d768d1e7c24275772a0a8ea0ffd
     console.log('🚀 worker end')
 }
 

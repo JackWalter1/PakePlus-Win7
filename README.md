@@ -1,153 +1,171 @@
-# PakePlus - Cross-Platform Desktop Application
+<h4 align="right"> 
+<span href=".README.md">English</span> 
+<a href="https://ppofficial.netlify.app/zh/" 
+style="margin: 0 10px;" >简体中文</a> 
+<a href="https://github.com/Sjj1024/PabBao/discussions/108">日本语</a>
+</h4>  
+<p align="center">
+    <img src="https://pakeplus.com/pplogo.png" width=300/>
+</p>
+<h1 align="center">PacBao｜PakePlus</h1>  
+<p align="center"><strong>Turn any webpage/Vue/React and so on into desktop and mobile app under 5M with easy in few minutes</strong>
+</p>
 
-Package any website into a cross-platform desktop app using Electron, with support for **Windows 7**.
+<p align="center">
+    <a href="https://github.com/Sjj1024/PakePlus/releases"><img src="https://img.shields.io/github/v/release/Sjj1024/PakePlus?style=flat-square&logo=github" alt="Release"></a>
+    <a href="https://github.com/Sjj1024/PakePlus/stargazers"><img src="https://img.shields.io/github/stars/Sjj1024/PakePlus?style=flat-square&logo=github" alt="Stars"></a>
+    <a href="https://github.com/Sjj1024/PakePlus/stargazers"><img src="https://img.shields.io/github/forks/Sjj1024/PakePlus?style=flat-square&logo=github" alt="Forks"></a>
+    <a href="https://github.com/Sjj1024/PakePlus/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/Sjj1024/PakePlus/build.yml?style=flat-square&logo=github" alt="Build"></a>
+    <a href="https://github.com/Sjj1024/PakePlus/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Sjj1024/PakePlus?style=flat-square&logo=github" alt="License"></a>
+    <a href="https://app.netlify.com/projects/pakeplus/deploys"><img src="https://api.netlify.com/api/v1/badges/f8454a03-8724-4797-9fe4-e6c51dd90e3a/deploy-status" alt="License"></a>
+</p>
 
-## System Requirements
+<div align="left">PacBao supports Mac, Windows, Linux, and Android & iOS. There’s no need to install complex dependencies locally, PacBao is only about 10MB in size. For the latest version, please see the <a href="[#popular-packages](https://github.com/Sjj1024/pakeplus/releases)">release page</a>. or visit: <a href="https://pakeplus.pages.dev" target="_blank">PacBao Web</a>. 
+Document: <a href="https://pakeplus.com/guide/" target="_blank">PacBao Guide</a></div>  
+<br>
 
--   **Windows**: Windows 7 or later (Windows 7 SP1 or higher recommended)
--   **macOS**: macOS 10.10 or later
--   **Linux**: Major Linux distributions
+> Due to individuals using this project to package illegal software, which violates its intended purpose, the front-end code will no longer be open-source. If such behavior is found again, all code in this project will cease to be open-source. Please use this software legally and responsibly, or bear the consequences.
 
-> **Note**: Windows XP Support
->
-> -   Electron 22.x does **not** support Windows XP
-> -   To support Windows XP, you must use Electron 2.x or earlier versions (not recommended due to serious security vulnerabilities)
-> -   Windows XP users are strongly encouraged to upgrade to Windows 7 or later
+https://github.com/user-attachments/assets/b88bf541-0b26-4020-9eec-da79e1734fc9
 
-## Install Dependencies
+<h1 align="center">Sponsors</h1>
 
-```bash
-npm install
+<p>
+PakePlus is an MIT-licensed open source project with its ongoing development made possible entirely by the support of these awesome backers. If you'd like to join them, please consider sponsoring PakePlus's development.
+</p>
+
+<table style="border-collapse: collapse; width: 100%; border: 1px solid #ddd;">
+    <tr>
+        <td align="center" style="border: 1px solid #ddd; padding: 20px;">
+            <img style="border-radius: 1.5rem" src="https://files.pakeplus.com/finevoice.png" width="100"/>
+            <h3 style="margin: 0"><a href="https://finevoice.ai/?ref=pakeplus" target="_blank">FineVoice</a></h3>
+            <p style="margin: 0">Create Every Voice You Imagine</p>
+        </td>
+        <td align="center" style="border: 1px solid #ddd; padding: 20px;">
+            <img style="border-radius: 1.5rem" src="https://avatars.githubusercontent.com/u/54536011?s=200&v=4" width="100"/>
+            <h3 style="margin: 0"><a href="https://tauri.app/" target="_blank">Tauri</a></h3>
+            <p style="margin: 0">Create cross-platform applications</p>
+        </td>
+        <td align="center" style="border: 1px solid #ddd; padding: 20px;">
+            <img style="border-radius: 1.5rem" src="https://avatars.githubusercontent.com/u/126759922?s=200&v=4" width="100"/>
+            <h3 style="margin: 0"><a href="https://cursor.com/agents" target="_blank">Cursor</a></h3>
+            <p style="margin: 0">Cursor is the best way to code with AI.</p>
+        </td>
+        <td align="center" style="border: 1px solid #ddd; padding: 20px;">
+            <img style="border-radius: 1.5rem" src="https://avatars.githubusercontent.com/u/878437?s=200&v=4" width="100"/>
+            <h3 style="margin: 0"><a href="https://www.jetbrains.com/idea/" target="_blank">JetBrains</a></h3>
+            <p style="margin: 0">The Leading IDE for Professional Development</p>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" style="border: 1px solid #ddd; padding: 20px;">
+            <img style="border-radius: 1.5rem" src="https://avatars.githubusercontent.com/u/24789812?s=200&v=4" width="100"/>
+            <h3 style="margin: 0"><a href="https://bit.dev/?ref=pakeplus" target="_blank">Bit</a></h3>
+            <p style="margin: 0">AI-powered development workspaces</p>
+        </td>
+        <td align="center" style="border: 1px solid #ddd; padding: 20px;">
+            <img style="border-radius: 1.5rem" src="https://avatars.githubusercontent.com/u/17219288?s=200&v=4" width="100"/>
+            <h3 style="margin: 0"><a href="https://www.prisma.io/?ref=pakeplus" target="_blank">Prisma</a></h3>
+            <p style="margin: 0">Prisma makes working with data easy</p>
+        </td>
+        <td align="center" style="border: 1px solid #ddd; padding: 20px;">
+            <img style="border-radius: 1.5rem" src="https://avatars.githubusercontent.com/u/314135?s=200&v=4" width="100"/>
+            <h3 style="margin: 0"><a href="https://www.cloudflare.com/?ref=pakeplus" target="_blank">Cloudflare</a></h3>
+            <p style="margin: 0">Build and deploy AI Agents on Cloudflare</p>
+        </td>
+    </tr>
+</table>
+
+## Features
+
+-   💎 Approximately 20 times smaller than Electron (less than 5MB!) and 10 times faster.
+-   🚀 Built with Rust Tauri, PacBao is lighter and faster than JavaScript-based frameworks.
+-   📦 Comes with rich built-in features — supports shortcuts, immersive windows, and minimalist customization.
+-   👻 PacBao is a minimalist tool that replaces traditional packaging with Tauri for cross-platform desktop apps.
+-   📲 Uses native frameworks to package Android and iOS apps — smaller and faster than Tauri2.
+-   🤗 Easy to use — just one GitHub Token is all you need to get a desktop app.
+-   🌹 No need to install complex dependencies locally — use GitHub Actions for cloud-based automatic packaging.
+-   🧑‍🤝‍🧑 Internationalization support — automatically follows your system language.
+-   💡 Supports custom JavaScript injection — write your own JS to inject into the page.
+-   🎨 Beautiful and user-friendly UI — better experience for beginners, supports Chinese names for packaging.
+-   📡 Usable directly via the web, but the client offers stronger functionality and is recommended.
+-   🔐 Data security — your token is stored only locally, and your project stays safely in your own Git repo.
+-   🍔 Supports local packaging and does not require installation of any dependent environments. Local packaging only takes 30 seconds
+-   🥥 It's okay without Github Token, local packaging is simple and convenient, and no Token is needed
+-   ⚔️ Support calling system level APIs in JS scripts, such as downloading files/executing commands/opening new windows, etc
+-   🍀 Supports static file packaging — drop in a compiled dist folder or index.html from Vue/React to create a client app.
+-   🐞 Debug mode supported — find and eliminate bugs during preview or release.
+-   💬 If you run into any issues, feel free to join our technical community for help.
+
+## Use Cases
+
+-   Have a website? Instantly turn it into a app and elevate its appearance.
+-   Have a Vue/React project and don’t want to buy a server? Package it as a desktop app.
+-   Want your Cocos game to run as a cross-platform client? No problem.
+-   Need to build your Unity project as a cross-platform client? Also no problem.
+-   Hide your website address from casual sharing or bots scraping your content.
+-   For internal company platforms — restrict access to your site via a dedicated client only.
+-   Turn any website into your custom client — inject JS for automation and custom features.
+-   Annoyed by website ads? Hide them with powerful JS.
+-   Want to use Tauri2 but the environment is too heavy? Use PacBao instead!
+
+## Getting Started
+
+1. Download the app from the release page：https://github.com/Sjj1024/PakePlus/releases,  
+   double-click to install, and run the app. or visit web:
+
+<a href="https://pakeplus.pages.dev" target="_blank">PacBao Web</a>
+
+2. Configure GitHub token or use local packaging, create a new project, and set up the configurations. get token guide. (When using this software, please comply with relevant laws and regulations. If you use GitHub token to use this project, it will automatically star the project and the compilation results will be counted for success or failure to improve the project and obtain feedback. Packaging is for personal use only and should not be disseminated or used for commercial purposes. The packaged resources will be stored in your own Github open source repository and can be viewed by anyone. Therefore, please strictly follow the Github usage guidelines, otherwise you will be responsible for the consequences)
+
+<a href="https://sjj1024.github.io/PakePlus/index_en.html">English</a> <a href="https://PakePlus.com/zh/guide/token.html" style="margin: 0 50px;">简体中文</a><a href="https://sjj1024.github.io/PakePlus/index_ja.html">日本语</a>
+
+```
+Explanation of Github Token permissions:
+1. For the beta version, token permissions required:
+All repositories: Fork an original template repository
+Actions: Manage GitHub actions
+Administration: Fork and manage files in the repository
+Contents: Add, delete, modify, and find repository contents
+Issues: Submit issues to PacBao
+
+1. For the classic version, token permissions required:
+repo: Fork and manage template code
+workflow: Compile and release your software
 ```
 
-## Development
+3. You can preview the app in a new window and click the publish button to package the app.
+4. You can download the app from the release page.
 
-```bash
-npm start
+## FAQ
+
+1. Mac users may see an “App is damaged” warning on installation. click cancel and Run the following command, then reopen the app:（This is because the application requires an official signature to avoid the prompt of "The application is damaged" popping up after installation. However, the cost of the official signature is $99 per year... Therefore, it is necessary to manually bypass the signature to use it normally）
+
+```sh
+sudo xattr -r -d com.apple.quarantine /Applications/PacBao.app
 ```
 
-## Configure Website URL
+1. When you package the app, Mac users may see an “App is damaged” warning on installation. click cancel and Run the following command, then reopen the app:
 
-Edit the `config.js` file and modify the `websiteUrl` to the site you want to package:
-
-```javascript
-module.exports = {
-    websiteUrl: 'https://www.example.com', // Modify this
-    // ... other configurations
-}
+```sh
+sudo xattr -r -d com.apple.quarantine /Applications/YourAppName.app
 ```
 
-You can also configure window size, app title, and more options in `config.js`.
+3. If you encounter any issues while using the program, please download the latest version, as versions developed before 2025 were based on Tauri v1.0. In 2025, Tauri was upgraded to v2.0. If the latest version still has issues, please submit an issue with detailed information so that we can update and resolve it more quickly.
 
-## Build Application
+4. After you add the GitHub Token, PacBao will fork a PacBao repository into your own repository. All your future projects will rely on this repository for creation and compilation, so please do not delete your PacBao repository.
 
-### Build for All Platforms
+## Custom Development
 
-```bash
-npm run build
-```
+If you want to Contribution PacBao, ensure your environment is prepared beforehand. Make sure Rust `>=1.63` and Node `>=16` (e.g., `16.18.1`) are installed on your computer. For installation guidance, please refer to the [Tauri Documentation](https://tauri.app/v1/guides/getting-started/prerequisites).
 
-### Build for Windows (32-bit & 64-bit)
+If you’re unfamiliar with these, it’s best to try the one-click packaging tool above.
 
-```bash
-npm run build:win
-```
-
-### Build for Windows 32-bit
-
-```bash
-npm run build:win32
-```
-
-### Build for Windows 64-bit
-
-```bash
-npm run build:win64
-```
-
-### Build for macOS
-
-```bash
-npm run build:mac
-```
-
-### Build for Linux
-
-```bash
-npm run build:linux
-```
-
-The packaged files will be generated in the `dist` directory.
-
-## Windows 7 Compatibility Notice
-
-This project uses **Electron 22.3.27**, which is the **last version that supports Windows 7**.
-Main features:
-
--   ✅ Supports Windows 7 SP1 and later
--   ✅ Supports Windows 8/8.1
--   ✅ Supports Windows 10/11
--   ❌ Does **not** support Windows XP (requires Electron 2.x, not recommended)
-
-## Project Structure
-
-```
-PakePlus-Win7/
-├── main.js          # Electron main process
-├── preload.js       # Preload script
-├── package.json     # Project configuration
-├── README.md        # Documentation
-└── dist/            # Output directory after build
-```
-
-## Custom Configuration
-
-### Change Application Icon
-
-1. Prepare the icon files:
-
-    - Windows: `build/icon.ico` (256x256)
-    - macOS: `build/icon.icns`
-    - Linux: `build/icon.png` (512x512)
-
-2. Place the files in the `build` directory.
-
-### Modify Application Information
-
-Edit the `build` section in `package.json`:
-
-```json
-{
-    "build": {
-        "appId": "com.yourcompany.app",
-        "productName": "Your App Name"
-    }
-}
-```
-
-## Common Issues
-
-### 1. Website Not Loading
-
--   Check your network connection
--   Ensure the website URL is correct
--   Verify that the website supports HTTPS (some sites may require certificate handling)
-
-### 2. Errors on Windows 7
-
--   Make sure you’re using **Windows 7 SP1**
--   Install the latest Windows updates
--   Install the **Visual C++ Redistributable**
-
-### 3. Build Failures
-
--   Ensure all dependencies are installed: `npm install`
--   Check your Node.js version (recommended 16.x or 18.x)
--   Clear cache and retry: delete `node_modules` and `package-lock.json`, then reinstall
--   If you’re on an Apple Silicon Mac, make sure you’re using **Electron 22+** (already configured)
-
-## License
+```sh
+# Install dependencies
+pnpm i
 
 MIT
 
 npm install --save-dev png-to-ico
+```
