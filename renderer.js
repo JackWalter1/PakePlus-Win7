@@ -95,29 +95,36 @@ function activateTab(targetId) {
     document.getElementById(targetId).classList.add('active')
 }
 
+function getActiveWebview() {
+    const activeTab = document.querySelector('.tab.active')
+    if (!activeTab) return null
+    const targetId = activeTab.id.replace('header-', '')
+    return document.getElementById(targetId)
+}
+
 // 初始化工具栏按钮
 function initToolbarButtons() {
+    // 返回按钮
+    document.getElementById('back-btn').addEventListener('click', () => {
+        const webviewEl = getActiveWebview()
+        if (webviewEl && typeof webviewEl.canGoBack === 'function' && webviewEl.canGoBack()) {
+            webviewEl.goBack()
+        }
+    })
+
     // 主页按钮
     document.getElementById('home-btn').addEventListener('click', () => {
-        const activeTab = document.querySelector('.tab.active')
-        if (activeTab) {
-            const targetId = activeTab.id.replace('header-', '')
-            const webviewEl = document.getElementById(targetId)
-            if (webviewEl) {
-                webviewEl.src = DEFAULT_HOME_URL
-            }
+        const webviewEl = getActiveWebview()
+        if (webviewEl) {
+            webviewEl.src = DEFAULT_HOME_URL
         }
     })
 
     // 刷新按钮
     document.getElementById('reload-btn').addEventListener('click', () => {
-        const activeTab = document.querySelector('.tab.active')
-        if (activeTab) {
-            const targetId = activeTab.id.replace('header-', '')
-            const webviewEl = document.getElementById(targetId)
-            if (webviewEl) {
-                webviewEl.reload()
-            }
+        const webviewEl = getActiveWebview()
+        if (webviewEl) {
+            webviewEl.reload()
         }
     })
 
