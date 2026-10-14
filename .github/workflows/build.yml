@@ -73,29 +73,30 @@ jobs:
                       --arg arch "$4" \
                       --arg artifact "$5" \
                       --arg glob "$6" \
-                      '. + [{label:$label, os:$os, script:$script, arch:$arch, artifact:$artifact, glob:$glob}]' \
+                      --arg use_system_fpm "$7" \
+                      '. + [{label:$label, os:$os, script:$script, arch:$arch, artifact:$artifact, glob:$glob, use_system_fpm:$use_system_fpm}]' \
                       <<<"$matrix")
                   }
 
                   # Tag pushes keep the existing Windows x64 release build.
                   # workflow_dispatch builds only the platforms selected in the form.
                   if [[ "$EVENT_NAME" == "push" || "$BUILD_WINDOWS_X86_64" == "true" ]]; then
-                    add "Windows x64" "windows-latest" "build:win" "x64" "windows-x64" "dist/*.exe"
+                    add "Windows x64" "windows-latest" "build:win" "x64" "windows-x64" "dist/*.exe" "false"
                   fi
                   if [[ "$BUILD_WINDOWS_ARM64" == "true" ]]; then
-                    add "Windows arm64" "windows-latest" "build:win" "arm64" "windows-arm64" "dist/*.exe"
+                    add "Windows arm64" "windows-latest" "build:win" "arm64" "windows-arm64" "dist/*.exe" "false"
                   fi
                   if [[ "$BUILD_MACOS_ARM64" == "true" ]]; then
-                    add "macOS arm64" "macos-latest" "build:mac" "arm64" "macos-arm64" "dist/*.dmg"
+                    add "macOS arm64" "macos-latest" "build:mac" "arm64" "macos-arm64" "dist/*.dmg" "false"
                   fi
                   if [[ "$BUILD_MACOS_X64" == "true" ]]; then
-                    add "macOS x64" "macos-latest" "build:mac" "x64" "macos-x64" "dist/*.dmg"
+                    add "macOS x64" "macos-latest" "build:mac" "x64" "macos-x64" "dist/*.dmg" "false"
                   fi
                   if [[ "$BUILD_LINUX_X86_64" == "true" ]]; then
-                    add "Linux x64" "ubuntu-latest" "build:linux" "x64" "linux-x64" "dist/*.{AppImage,deb}"
+                    add "Linux x64" "ubuntu-latest" "build:linux" "x64" "linux-x64" "dist/*.{AppImage,deb}" "false"
                   fi
                   if [[ "$BUILD_LINUX_ARM64" == "true" ]]; then
-                    add "Linux arm64" "ubuntu-24.04-arm" "build:linux" "arm64" "linux-arm64" "dist/*.{AppImage,deb}"
+                    add "Linux arm64" "ubuntu-24.04-arm" "build:linux" "arm64" "linux-arm64" "dist/*.{AppImage,deb}" "true"
                   fi
 
                   echo "Selected targets:"
@@ -135,6 +136,13 @@ jobs:
               if: runner.os == 'Linux'
               run: sudo apt-get update && sudo apt-get install -y fakeroot dpkg
 
+            - name: Install system fpm
+              if: matrix.use_system_fpm == 'true'
+              run: |
+                  sudo apt-get install -y ruby ruby-dev build-essential
+                  sudo gem install --no-document fpm
+                  fpm --version
+
             - name: Install dependencies
               run: npm ci
 
@@ -146,6 +154,7 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   CSC_IDENTITY_AUTO_DISCOVERY: false
+                  USE_SYSTEM_FPM: ${{ matrix.use_system_fpm }}
 
             - name: Upload build artifacts
               uses: actions/upload-artifact@v4
