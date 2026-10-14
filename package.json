@@ -1,5 +1,5 @@
 {
-    "name": "pakeplus-win7",
+    "name": "ta​book​",
     "version": "1.0.0",
     "description": "跨平台桌面应用，支持 Windows 7",
     "main": "main.js",
@@ -25,7 +25,7 @@
         "cross-platform"
     ],
     "author": {
-        "name": "PakePlus",
+        "name": "ta​book​",
         "email": "support@pakeplus.com"
     },
     "license": "MIT",
@@ -37,8 +37,8 @@
         "sharp": "^0.34.5"
     },
     "build": {
-        "appId": "com.pakeplus.win7",
-        "productName": "PakeTabs",
+        "appId": "com.ta​book​.win7",
+        "productName": "ta​book​",
         "icon": "app-icon.ico",
         "directories": {
             "output": "dist"
