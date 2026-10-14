@@ -1,6 +1,8 @@
 {
     "name": "图书管理系统",
     "version": "1.0.0",
+    "author": "PakePlus",
+    "email": "support@pakeplus.com",
     "url": "https://www.pakeplus.com",
     "password": "666666",
     "input": "./app-icon.png",
