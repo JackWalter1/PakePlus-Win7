@@ -92,11 +92,13 @@ jobs:
                   if [[ "$BUILD_MACOS_X64" == "true" ]]; then
                     add "macOS x64" "macos-latest" "build:mac" "x64" "macos-x64" "dist/*.dmg" "false"
                   fi
+                  # upload-artifact does not expand brace globs such as *.{AppImage,deb}.
+                  linux_glob=$(printf '%s\n' 'dist/*.AppImage' 'dist/*.deb')
                   if [[ "$BUILD_LINUX_X86_64" == "true" ]]; then
-                    add "Linux x64" "ubuntu-latest" "build:linux" "x64" "linux-x64" "dist/*.{AppImage,deb}" "false"
+                    add "Linux x64" "ubuntu-latest" "build:linux" "x64" "linux-x64" "$linux_glob" "false"
                   fi
                   if [[ "$BUILD_LINUX_ARM64" == "true" ]]; then
-                    add "Linux arm64" "ubuntu-24.04-arm" "build:linux" "arm64" "linux-arm64" "dist/*.{AppImage,deb}" "true"
+                    add "Linux arm64" "ubuntu-24.04-arm" "build:linux" "arm64" "linux-arm64" "$linux_glob" "true"
                   fi
 
                   echo "Selected targets:"
