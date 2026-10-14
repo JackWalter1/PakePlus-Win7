@@ -1,5 +1,5 @@
 {
-    "name": "ta​book​",
+    "name": "TabBook",
     "version": "1.0.0",
     "description": "跨平台桌面应用，支持 Windows 7",
     "main": "main.js",
@@ -38,7 +38,7 @@
     },
     "build": {
         "appId": "com.ta​book​.win7",
-        "productName": "ta​book​",
+        "productName": "TabBook",
         "icon": "app-icon.ico",
         "directories": {
             "output": "dist"
