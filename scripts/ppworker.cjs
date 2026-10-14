@@ -13,6 +13,18 @@ const updatePackageJson = async (appName, version) => {
     await fs.writeJson(path.join(__dirname, '../', 'package.json'), packageJson)
 }
 
+// update package.json author and email
+const updateAuthor = async (author, email) => {
+    const packageJsonPath = path.join(__dirname, '../', 'package.json')
+    const packageJson = await fs.readJson(packageJsonPath)
+    packageJson.author = {
+        name: author,
+        email,
+    }
+    await fs.writeJson(packageJsonPath, packageJson)
+    console.log('package.json author updated')
+}
+
 // update renderer.js DEFAULT_HOME_URL
 const updateRendererJs = async (url) => {
     const rendererJs = await fs.readFile(
@@ -89,12 +101,15 @@ const createIcoIcon = async () => {
 // Main execution
 const main = async () => {
     console.log('🚀 worker start')
-    const { name, version, url, password } = ppconfig
+    const { name, version, url, password, author, email } = ppconfig
     console.log('name:', name)
     console.log('version:', version)
     console.log('url:', url)
     console.log('password:', password)
+    console.log('author:', author)
+    console.log('email:', email)
     await updatePackageJson(name, version)
+    await updateAuthor(author, email)
     await updateRendererJs(url)
     await updateMainJs(password)
     await createIcnsIcon()
